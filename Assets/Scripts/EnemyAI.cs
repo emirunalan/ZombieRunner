@@ -12,6 +12,7 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] float turnSpeed = 5f;
 
     NavMeshAgent navMeshAgent;
+    EnemyHealth health;
     float distanceToTarget = Mathf.Infinity;
     bool isProvoked;
 
@@ -19,14 +20,24 @@ public class EnemyAI : MonoBehaviour
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+        health = GetComponent<EnemyHealth>();
         
     }
 
     void Update()
     {
+        
+        if(health.IsDead())
+        {
+            enabled = false;
+            navMeshAgent.enabled = false;
+        }
+        
         distanceToTarget = Vector3.Distance(target.position, transform.position);
         
-        if(isProvoked){
+        
+        if(isProvoked)
+        {
             EngageTarget();
         }
 
@@ -66,17 +77,23 @@ public class EnemyAI : MonoBehaviour
 
     private void ChaseTarget()
     {
-        GetComponent<Animator>().SetBool("attack",false);
-        GetComponent<Animator>().SetTrigger("move");
-        navMeshAgent.SetDestination(target.position);
+        if(!GetComponent<EnemyHealth>().IsDead())
+        {
+            GetComponent<Animator>().SetBool("attack",false);
+            GetComponent<Animator>().SetTrigger("move");
+            navMeshAgent.SetDestination(target.position);
+        }
         
     }
 
     private void FaceTarget()
     {
-        Vector3 direction = (target.position - transform.position).normalized;
-        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * turnSpeed);
+        if(!GetComponent<EnemyHealth>().IsDead())
+        {
+            Vector3 direction = (target.position - transform.position).normalized;
+            Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * turnSpeed);
+        }
     }
 
     void OnDrawGizmosSelected()
