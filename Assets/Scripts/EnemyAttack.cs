@@ -18,8 +18,8 @@ public class EnemyAttack : MonoBehaviour
     public void AttackHitEvent()
     {
         if(target == null) return;
-        Debug.Log("bang bang");
         player.TakeDamagePlayer(damage);
+        player.GetComponent<DisplayDamage>().ShowDamageImpact();
     }
 
 
